@@ -685,6 +685,8 @@ function deleteWorkflow() {
   });
 }
 async function saveWorkflow() {
+  // FINDING by alireza
+  // For saving workflow in editor mode in a new tab (using save button)
   try {
     const flow = props.editor.toObject();
     flow.edges = flow.edges.map((edge) => {

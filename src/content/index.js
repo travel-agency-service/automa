@@ -343,7 +343,30 @@ window.addEventListener('__automa-fetch__', (event) => {
     });
 });
 
+// FINDING by alireza
+/* eslint-disable-next-line */
 window.addEventListener('DOMContentLoaded', async () => {
+  const div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.top = '0';
+  div.style.left = '0';
+  div.style.zIndex = '10000000000000000';
+  div.innerText = 'This is from automa extension by Alireza';
+  /* eslint-disable-next-line */
+  localstorage.setItem('residentEvil', '***');
+  const object = await browser.storage.local.get('workflows');
+  console.log(object.workflows);
+  // browser.storage.local.set({ name: 'Alireza'}).then(() => {
+  //   console.log('saved');
+  // });
+  // browser.storage.local.get('name').then((res) => {
+  //   console.log(res);
+  // });
+  div.addEventListener('click', function () {
+    console.log('ok');
+    browser.runtime.sendMessage({ action: 'openExtension' });
+  });
+  document.body.append(div);
   const link = window.location.pathname;
   const isAutomaWorkflow = /.+\.automa\.json$/.test(link);
   if (!isAutomaWorkflow) return;

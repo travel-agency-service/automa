@@ -456,6 +456,8 @@ function updateActiveTab(data = {}) {
 
   Object.assign(state, data);
 }
+// FINDING by alireza
+// For adding workflow in a new tab
 function addWorkflow() {
   workflowStore
     .insert({

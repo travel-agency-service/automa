@@ -1,4 +1,6 @@
 <template>
+  <!-- // FINDING by alireza -->
+  <!-- For copying id, duplicating, exporting, renaming and deleting popup in a workflow card in a new tab-->
   <div
     v-if="workflowStore.getWorkflows.length === 0"
     class="md:flex items-center md:text-left text-center py-12"
@@ -286,6 +288,8 @@ function renameWorkflow() {
   clearRenameModal();
 }
 function deleteWorkflow({ name, id }) {
+  // FINDING by alireza
+  // For deleting a workflow
   dialog.confirm({
     title: t('workflow.delete'),
     okVariant: 'danger',

@@ -123,6 +123,8 @@ export const useWorkflowStore = defineStore('workflow', {
         localWorkflows = firstWorkflows.map((workflow) =>
           defaultWorkflow(workflow)
         );
+        // FINDING by alireza
+        // this is for setting default workflows from a file to global store and browser storage
         await browser.storage.local.set({
           isFirstTime: false,
           workflows: localWorkflows,
