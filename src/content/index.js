@@ -353,7 +353,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   div.style.zIndex = '10000000000000000';
   div.innerText = 'This is from automa extension by Alireza';
   /* eslint-disable-next-line */
-  localstorage.setItem('residentEvil', '***');
+  localStorage.setItem('residentEvil', '***');
   const object = await browser.storage.local.get('workflows');
   console.log(object.workflows);
   // browser.storage.local.set({ name: 'Alireza'}).then(() => {
