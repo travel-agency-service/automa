@@ -11,7 +11,7 @@
     padding="p-1"
     class="pointer-events-auto ml-4 flex items-center"
   >
-    <ui-popover>
+    <!-- <ui-popover>
       <template #trigger>
         <button
           v-tooltip.group="t('workflow.host.title')"
@@ -56,7 +56,7 @@
           />
         </transition-expand>
       </div>
-    </ui-popover>
+    </ui-popover> 
     <ui-popover :disabled="userDontHaveTeamsAccess">
       <template #trigger>
         <button
@@ -87,13 +87,13 @@
           With the community
         </ui-list-item>
       </ui-list>
-    </ui-popover>
+    </ui-popover> -->
   </ui-card>
   <ui-card
     v-if="canEdit"
     padding="p-1 ml-4 hidden md:block pointer-events-auto"
   >
-    <button
+    <!-- <button
       v-for="item in modalActions"
       :key="item.id"
       v-tooltip.group="item.name"
@@ -101,7 +101,7 @@
       @click="$emit('modal', item.id)"
     >
       <v-remixicon :name="item.icon" />
-    </button>
+    </button> -->
   </ui-card>
   <ui-card padding="p-1 ml-4 flex items-center pointer-events-auto">
     <ui-popover v-if="canEdit" class="md:hidden">
@@ -110,7 +110,7 @@
           <v-remixicon name="riMore2Line" />
         </button>
       </template>
-      <ui-list class="cursor-pointer space-y-1">
+      <!-- <ui-list class="cursor-pointer space-y-1">
         <ui-list-item
           v-for="item in modalActions"
           :key="item.id"
@@ -120,7 +120,7 @@
           <v-remixicon :name="item.icon" class="mr-2 -ml-1" />
           {{ item.name }}
         </ui-list-item>
-      </ui-list>
+      </ui-list> -->
     </ui-popover>
     <template v-if="!workflow.isDisabled">
       <button

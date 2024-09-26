@@ -1,7 +1,8 @@
 <template>
   <template v-if="retrieved">
     <app-sidebar v-if="$route.name !== 'recording'" />
-    <main :class="{ 'pl-16': $route.name !== 'recording' }">
+    <!-- <main :class="{ 'pl-16': $route.name !== 'recording' }"> -->
+    <main>
       <router-view />
     </main>
     <app-logs />

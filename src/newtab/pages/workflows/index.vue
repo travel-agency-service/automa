@@ -4,17 +4,29 @@
       {{ t('common.workflow', 2) }}
     </h1>
     <div class="mt-8 flex items-start">
-      <div class="sticky top-8 hidden w-60 lg:block">
+      <!-- new work flow button with new style -->
+      <!-- for now arrow down button beside new workflow button is hidden and the style of button for new workflow has changed -->
+      <!-- hide browse workflows, team workflows, my workflows-->
+      <!--<div class="sticky top-8 hidden w-60 lg:block">
         <div class="flex w-full">
           <ui-button
             :title="shortcut['action:new'].readable"
             variant="accent"
-            class="flex-1 rounded-r-none border-r font-semibold"
+            class="flex-1 border-r font-semibold"
             @click="addWorkflowModal.show = true"
           >
             {{ t('workflow.new') }}
           </ui-button>
-          <ui-popover>
+          <ui-button
+            :title="shortcut['action:new'].readable"
+            variant="accent"
+            class="flex-1 rounded-r-none border-r font-semibold"
+            class="flex-1 border-r font-semibold"
+            @click="addWorkflowModal.show = true"
+          >
+            {{ t('workflow.new') }}
+          </ui-button>
+         <ui-popover>
             <template #trigger>
               <ui-button icon class="rounded-l-none" variant="accent">
                 <v-remixicon name="riArrowLeftSLine" rotate="-90" />
@@ -43,10 +55,10 @@
                 {{ t('workflow.host.add') }}
               </ui-list-item>
             </ui-list>
-          </ui-popover>
-        </div>
-        <ui-list class="mt-6 space-y-2">
-          <ui-list-item
+          </ui-popover> 
+        </div> 
+       <ui-list class="mt-6 space-y-2">
+         <ui-list-item
             tag="a"
             href="https://www.automa.site/workflows"
             target="_blank"
@@ -55,7 +67,7 @@
             <span class="ml-4 capitalize">
               {{ t('workflow.browse') }}
             </span>
-          </ui-list-item>
+          </ui-list-item> 
           <ui-expand
             v-if="state.teams.length > 0"
             append-icon
@@ -82,8 +94,8 @@
                 </span>
               </ui-list-item>
             </ui-list>
-          </ui-expand>
-          <ui-expand
+          </ui-expand> 
+           <ui-expand
             :model-value="true"
             append-icon
             header-class="px-4 py-2 rounded-lg hoverable w-full flex items-center"
@@ -132,12 +144,12 @@
               </ui-list-item>
             </ui-list>
           </ui-expand>
-        </ui-list>
+        </ui-list> 
         <workflows-folder
           v-if="state.activeTab === 'local'"
           v-model="state.activeFolder"
         />
-      </div>
+      </div>-->
       <div
         class="workflows-list flex-1 lg:ml-8"
         style="min-height: calc(100vh - 8rem)"
@@ -145,6 +157,14 @@
       >
         <div class="flex flex-wrap items-center">
           <div class="flex w-full items-center md:w-auto">
+            <ui-button
+              :title="shortcut['action:new'].readable"
+              variant="accent"
+              class="flex-1 border-r font-semibold mr-1"
+              @click="addWorkflowModal.show = true"
+            >
+              {{ t('workflow.new') }}
+            </ui-button>
             <ui-input
               id="search-input"
               v-model="state.query"
@@ -154,6 +174,7 @@
               })`"
               prepend-icon="riSearch2Line"
             />
+
             <ui-popover>
               <template #trigger>
                 <ui-button variant="accent" class="ml-4 lg:hidden">
@@ -195,7 +216,7 @@
           </div>
           <div class="grow"></div>
           <div class="mt-4 flex w-full items-center md:mt-0 md:w-auto">
-            <span
+            <!-- <span
               v-tooltip:bottom.group="t('workflow.backupCloud')"
               class="mr-4"
             >
@@ -207,7 +228,7 @@
               >
                 <v-remixicon name="riUploadCloud2Line" />
               </ui-button>
-            </span>
+            </span> -->
             <div class="workflow-sort flex flex-1 items-center">
               <ui-button
                 icon
@@ -230,7 +251,7 @@
                 </option>
               </ui-select>
             </div>
-            <ui-select
+            <!-- <ui-select
               v-model="state.activeTab"
               class="ml-4 lg:hidden"
               :placeholder="t('common.workflow', 2)"
@@ -244,7 +265,7 @@
               <option v-if="hostedWorkflows?.length > 0" value="host">
                 {{ t('workflow.type.host') }}
               </option>
-            </ui-select>
+            </ui-select> -->
           </div>
         </div>
         <ui-tab-panels v-model="state.activeTab" class="mt-6 flex-1">

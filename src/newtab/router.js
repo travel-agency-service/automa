@@ -28,6 +28,7 @@ const routes = [
   {
     name: 'welcome',
     path: '/welcome',
+    redirect: '/workflows',
     component: Welcome,
   },
   {
