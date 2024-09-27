@@ -678,6 +678,7 @@ function deleteWorkflow() {
       } else if (props.isTeam) {
         await teamWorkflowStore.delete(teamId, props.workflow.id);
       } else {
+        // this is for deleting a workflow
         await workflowStore.delete(props.workflow.id);
       }
 
