@@ -1,6 +1,6 @@
 <template>
   <template v-if="!workflow.connectedTable">
-    <ui-popover class="mb-4">
+    <!-- <ui-popover class="mb-4">
       <template #trigger>
         <ui-button> Connect to a storage table </ui-button>
       </template>
@@ -18,7 +18,7 @@
           {{ item.name }}
         </ui-list-item>
       </ui-list>
-    </ui-popover>
+    </ui-popover> -->
     <div class="mb-4 flex">
       <ui-input
         v-model="state.query"
