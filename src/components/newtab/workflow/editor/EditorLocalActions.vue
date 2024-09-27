@@ -657,6 +657,7 @@ function initRenameWorkflow() {
     description: `${props.workflow.description}`,
   });
 }
+//this is for renaming workflow
 function renameWorkflow() {
   updateWorkflow({
     name: renameState.name,
