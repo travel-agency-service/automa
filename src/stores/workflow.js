@@ -374,5 +374,46 @@ export const useWorkflowStore = defineStore('workflow', {
 
       return id;
     },
+    async customDelete(id) {
+      try {
+        const apiResponse = await customFetchApi(
+          `/automation/workflows/${id}/delete`,
+          {
+            method: 'DELETE',
+          }
+        );
+        if (apiResponse.status !== 200) {
+          return null;
+        }
+        await this.customRefetchData();
+
+        delete this.workflows[id];
+
+        await cleanWorkflowTriggers(id);
+
+        await browser.storage.local.remove([
+          `state:${id}`,
+          `draft:${id}`,
+          `draft-team:${id}`,
+        ]);
+        await this.saveToStorage('workflows');
+
+        const { pinnedWorkflows } = await browser.storage.local.get(
+          'pinnedWorkflows'
+        );
+        const pinnedWorkflowIndex = pinnedWorkflows
+          ? pinnedWorkflows.indexOf(id)
+          : -1;
+        if (pinnedWorkflowIndex !== -1) {
+          pinnedWorkflows.splice(pinnedWorkflowIndex, 1);
+          await browser.storage.local.set({ pinnedWorkflows });
+        }
+
+        return id;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    },
   },
 });

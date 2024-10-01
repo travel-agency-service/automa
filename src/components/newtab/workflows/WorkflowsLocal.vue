@@ -126,6 +126,7 @@ import { exportWorkflow } from '@/utils/workflowData';
 import { useSharedWorkflowStore } from '@/stores/sharedWorkflow';
 import { executeWorkflow } from '@/workflowEngine';
 import WorkflowsLocalCard from './WorkflowsLocalCard.vue';
+import { useToast } from 'vue-toastification';
 
 const props = defineProps({
   search: {
@@ -153,6 +154,7 @@ const emit = defineEmits(['update:perPage']);
 const { t } = useI18n();
 const dialog = useDialog();
 const userStore = useUserStore();
+const toast = useToast();
 const workflowStore = useWorkflowStore();
 const sharedWorkflowStore = useSharedWorkflowStore();
 
@@ -295,7 +297,20 @@ function deleteWorkflow({ name, id }) {
     okVariant: 'danger',
     body: t('message.delete', { name }),
     onConfirm: () => {
-      workflowStore.delete(id);
+      workflowStore
+        .customDelete(id)
+        .then((res) => {
+          if (res) {
+            toast.success('The workflow was removed successfully.');
+          } else {
+            toast.error(
+              'An error occured while removing workflow from server!'
+            );
+          }
+        })
+        .catch((e) => {
+          toast.error('An error occured while removing workflow from server!');
+        });
     },
   });
 }

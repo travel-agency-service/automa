@@ -679,7 +679,21 @@ function deleteWorkflow() {
         await teamWorkflowStore.delete(teamId, props.workflow.id);
       } else {
         // this is for deleting a workflow
-        await workflowStore.delete(props.workflow.id);
+        try {
+          const customDeleteResult = await workflowStore.customDelete(
+            props.workflow.id
+          );
+          if (customDeleteResult) {
+            toast.success('The workflow was removed successfully.');
+          } else {
+            toast.error(
+              'An error occured while removing workflow from server!'
+            );
+          }
+        } catch (e) {
+          console.log(e);
+          toast.error('An error occured while removing workflow from server!');
+        }
       }
 
       router.replace(props.isPackage ? '/packages' : '/');
