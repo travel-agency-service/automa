@@ -1,6 +1,6 @@
-import secrets from 'customSecret';
+import secrets from './customSecret';
 
-export async function fetchApi(path, options = {}) {
+export async function customFetchApi(path, options = {}) {
   const urlPath = path.startsWith('/') ? path : `/${path}`;
   const headers = {
     'Content-Type': 'application/json',
