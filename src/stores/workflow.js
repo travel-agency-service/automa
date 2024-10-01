@@ -121,15 +121,33 @@ export const useWorkflowStore = defineStore('workflow', {
       let localWorkflows = workflows || {};
 
       if (isFirstTime) {
-        localWorkflows = firstWorkflows.map((workflow) =>
-          defaultWorkflow(workflow)
-        );
         // FINDING by alireza
         // this is for setting default workflows from a file to global store and browser storage
-        await browser.storage.local.set({
-          isFirstTime: false,
-          workflows: localWorkflows,
-        });
+        // localWorkflows = firstWorkflows.map((workflow) =>
+        //   defaultWorkflow(workflow)
+        // );
+
+        try {
+          const apiResponse = await customFetchApi('/automation/workflows/', {
+            method: 'GET',
+          });
+          if (apiResponse.status !== 200) {
+            alert(
+              'There is an error while fetching workflows from the server.'
+            );
+            return null;
+          }
+          const apiResult = await apiResponse.json();
+          localWorkflows = apiResult.map((x) => defaultWorkflow(x.data));
+
+          await browser.storage.local.set({
+            isFirstTime: false,
+            workflows: localWorkflows,
+          });
+        } catch (e) {
+          alert('There is an error while fetching workflows from the server.');
+          return null;
+        }
       }
 
       this.isFirstTime = isFirstTime;
