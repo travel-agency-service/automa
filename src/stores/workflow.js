@@ -155,6 +155,34 @@ export const useWorkflowStore = defineStore('workflow', {
 
       this.retrieved = true;
     },
+    async customRefetchData() {
+      const { workflows } = await browser.storage.local.get(['workflows']);
+
+      let localWorkflows = workflows || {};
+
+      try {
+        const apiResponse = await customFetchApi('/automation/workflows/', {
+          method: 'GET',
+        });
+        if (apiResponse.status !== 200) {
+          alert('There is an error while fetching workflows from the server.');
+          return null;
+        }
+        const apiResult = await apiResponse.json();
+        localWorkflows = apiResult.map((x) => defaultWorkflow(x.data));
+
+        await browser.storage.local.set({
+          isFirstTime: false,
+          workflows: localWorkflows,
+        });
+      } catch (e) {
+        alert('There is an error while fetching workflows from the server.');
+        return null;
+      }
+
+      this.workflows = convertWorkflowsToObject(localWorkflows);
+      this.retrieved = true;
+    },
     updateStates(newStates) {
       this.states = newStates;
     },
@@ -203,6 +231,7 @@ export const useWorkflowStore = defineStore('workflow', {
         if (apiResponse.status !== 200) {
           return null;
         }
+        await this.customRefetchData();
 
         this.workflows[workflow.id] = workflow;
         insertedWorkflow[workflow.id] = workflow;
