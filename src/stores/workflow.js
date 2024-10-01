@@ -246,32 +246,90 @@ export const useWorkflowStore = defineStore('workflow', {
       const isFunction = typeof id === 'function';
       if (!isFunction && !this.workflows[id]) return null;
 
+      const currentDate = Date.now();
       const updatedWorkflows = {};
-      const updateData = { ...data, updatedAt: Date.now() };
+      const updateData = { ...data, updatedAt: currentDate };
 
       const workflowUpdater = (workflowId) => {
+        let successful = true;
         if (deep) {
-          this.workflows[workflowId] = deepmerge(
+          const mergedWorkFlow = deepmerge(
             this.workflows[workflowId],
             updateData
           );
+
+          customFetchApi(`/automation/workflows/${workflowId}/update`, {
+            body: JSON.stringify({
+              data: mergedWorkFlow,
+            }),
+            method: 'PUT',
+          })
+            .then((apiResponse) => {
+              if (apiResponse.status !== 200) {
+                return null;
+              }
+              this.customRefetchData()
+                .then((res) => {
+                  this.workflows[workflowId] = mergedWorkFlow;
+                })
+                .catch((err) => {
+                  successful = false;
+                  console.log(e);
+                  return null;
+                });
+            })
+            .catch((err) => {
+              successful = false;
+              console.log(err);
+              return null;
+            });
         } else {
-          Object.assign(this.workflows[workflowId], updateData);
-        }
-
-        this.workflows[workflowId].updatedAt = Date.now();
-        updatedWorkflows[workflowId] = this.workflows[workflowId];
-
-        if (!('isDisabled' in data)) return;
-
-        if (data.isDisabled) {
-          cleanWorkflowTriggers(workflowId);
-        } else {
-          const triggerBlock = this.workflows[workflowId].drawflow.nodes?.find(
-            (node) => node.label === 'trigger'
+          const copyCurrentWorkflow = JSON.parse(
+            JSON.stringify(this.workflows[workflowId])
           );
-          if (triggerBlock) {
-            registerWorkflowTrigger(id, triggerBlock);
+          Object.assign(copyCurrentWorkflow, updateData);
+
+          customFetchApi(`/automation/workflows/${workflowId}/update`, {
+            body: JSON.stringify({
+              data: copyCurrentWorkflow,
+            }),
+            method: 'PUT',
+          })
+            .then((apiResponse) => {
+              if (apiResponse.status !== 200) {
+                return null;
+              }
+              this.customRefetchData()
+                .then((res) => {
+                  Object.assign(this.workflows[workflowId], updateData);
+                })
+                .catch((err) => {
+                  successful = false;
+                  console.log(e);
+                  return null;
+                });
+            })
+            .catch((err) => {
+              successful = false;
+              console.log(err);
+              return null;
+            });
+        }
+        if (successful) {
+          this.workflows[workflowId].updatedAt = currentDate;
+          updatedWorkflows[workflowId] = this.workflows[workflowId];
+
+          if (!('isDisabled' in data)) return;
+
+          if (data.isDisabled) {
+            cleanWorkflowTriggers(workflowId);
+          } else {
+            const triggerBlock = this.workflows[
+              workflowId
+            ].drawflow.nodes?.find((node) => node.label === 'trigger');
+            if (triggerBlock) {
+              registerWorkflowTrigger(id, triggerBlock);
+            }
           }
         }
       };
