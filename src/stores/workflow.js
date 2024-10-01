@@ -12,6 +12,7 @@ import {
   registerWorkflowTrigger,
 } from '@/utils/workflowTrigger';
 import { useUserStore } from './user';
+import { customFetchApi } from '@/utils/customApi';
 
 const defaultWorkflow = (data = null, options = {}) => {
   let workflowData = {
@@ -165,6 +166,34 @@ export const useWorkflowStore = defineStore('workflow', {
       await this.saveToStorage('workflows');
 
       return insertedWorkflows;
+    },
+    async customInsert(data = {}, options = {}) {
+      const insertedWorkflow = {};
+      const workflow = defaultWorkflow(data, options);
+
+      try {
+        const apiResponse = await customFetchApi(
+          '/automation/workflows/create',
+          {
+            body: JSON.stringify({
+              nanoid: workflow.id,
+              data: workflow,
+            }),
+            method: 'POST',
+          }
+        );
+        if (apiResponse.status !== 200) {
+          return null;
+        }
+
+        this.workflows[workflow.id] = workflow;
+        insertedWorkflow[workflow.id] = workflow;
+        await this.saveToStorage('workflows');
+        return insertedWorkflow;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
     },
     async update({ id, data = {}, deep = false }) {
       const isFunction = typeof id === 'function';

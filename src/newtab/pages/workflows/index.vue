@@ -360,7 +360,10 @@
       <p class="mb-6 text-right text-gray-600 dark:text-gray-200">
         {{ addWorkflowModal.description.length }}/300
       </p>
-      <div class="flex space-x-2">
+      <div v-if="state.isFetchingDataFromCustomApi" style="text-align: center">
+        <ui-spinner color="text-accent" />
+      </div>
+      <div v-else class="flex space-x-2">
         <ui-button class="w-full" @click="clearAddWorkflowModal">
           {{ t('common.cancel') }}
         </ui-button>
@@ -431,6 +434,7 @@ const validTeamId = userStore.user?.teams?.some(
 
 const state = shallowReactive({
   teams: [],
+  isFetchingDataFromCustomApi: false,
   query: '',
   activeFolder: '',
   activeTab: active || 'local',
@@ -480,17 +484,29 @@ function updateActiveTab(data = {}) {
 // FINDING by alireza
 // For adding workflow in a new tab
 function addWorkflow() {
+  state.isFetchingDataFromCustomApi = true;
   workflowStore
-    .insert({
+    .customInsert({
       name: addWorkflowModal.name,
       folderId: state.activeFolder,
       description: addWorkflowModal.description,
     })
-    .then((workflows) => {
-      const workflowId = Object.keys(workflows)[0];
+    .then((workflow) => {
+      state.isFetchingDataFromCustomApi = false;
+      if (!workflow) {
+        toast.error(
+          'There is an error while saving the workflow on the server!'
+        );
+        return;
+      }
+      toast.success('The workflow was saved on the server!');
+      const workflowId = Object.keys(workflow)[0];
       router.push(`/workflows/${workflowId}`);
     })
-    .finally(clearAddWorkflowModal);
+    .finally(() => {
+      clearAddWorkflowModal();
+      state.isFetchingDataFromCustomApi = false;
+    });
 }
 async function checkWorkflowPermissions(workflows) {
   let requiredPermissions = [];
