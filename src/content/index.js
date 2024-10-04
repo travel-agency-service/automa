@@ -346,27 +346,52 @@ window.addEventListener('__automa-fetch__', (event) => {
 // FINDING by alireza
 /* eslint-disable-next-line */
 window.addEventListener('DOMContentLoaded', async () => {
-  const div = document.createElement('div');
-  div.style.position = 'absolute';
-  div.style.top = '0';
-  div.style.left = '0';
-  div.style.zIndex = '10000000000000000';
-  div.innerText = 'This is from automa extension by Alireza';
+  const fancyButton = document.createElement('button');
+  fancyButton.textContent = 'Workflow Manager';
+  // Apply styles to the button
+  fancyButton.style.position = 'fixed';
+  fancyButton.style.bottom = '0';
+  fancyButton.style.right = '0';
+  fancyButton.style.zIndex = '10000000000000000';
+  fancyButton.style.backgroundColor = 'rgb(189,215,188)';
+  fancyButton.style.border = '1px solid rgb(189,215,188)';
+  fancyButton.style.color = 'black';
+  fancyButton.style.margin = '10px';
+  fancyButton.style.borderRadius = '30px';
+  fancyButton.style.padding = '15px 15px';
+  fancyButton.style.fontSize = '14px';
+  fancyButton.style.cursor = 'pointer';
+  fancyButton.style.transition =
+    'background-color 0.3s ease, transform 0.3s ease';
+
+  fancyButton.addEventListener('mouseover', () => {
+    fancyButton.style.backgroundColor = 'white';
+    fancyButton.style.transform = 'scale(1.05)';
+  });
+
+  fancyButton.addEventListener('mouseout', () => {
+    fancyButton.style.backgroundColor = 'rgb(189,215,188)';
+    fancyButton.style.transform = 'scale(1)';
+  });
+
   /* eslint-disable-next-line */
-  localStorage.setItem('residentEvil', '***');
-  const object = await browser.storage.local.get('workflows');
-  console.log(object.workflows);
+  // localStorage.setItem('residentEvil', '***');
+  // const object = await browser.storage.local.get('workflows');
+  // console.log(object.workflows);
   // browser.storage.local.set({ name: 'Alireza'}).then(() => {
   //   console.log('saved');
   // });
   // browser.storage.local.get('name').then((res) => {
   //   console.log(res);
   // });
-  div.addEventListener('click', function () {
-    console.log('ok');
+  fancyButton.addEventListener('click', function () {
+    if (window.location.href.indexOf('signin') !== -1) {
+      alert('You should login first!');
+      return;
+    }
     browser.runtime.sendMessage({ action: 'openExtension' });
   });
-  document.body.append(div);
+  document.body.append(fancyButton);
   const link = window.location.pathname;
   const isAutomaWorkflow = /.+\.automa\.json$/.test(link);
   if (!isAutomaWorkflow) return;
