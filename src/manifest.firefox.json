@@ -35,19 +35,20 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://panel.hobs.ai/*"],
       "js": ["contentScript.bundle.js"],
       "run_at": "document_start",
+      "match_about_blank": true,
       "all_frames": true
-    },
-    {
-      "matches": ["*://*.automa.site/*", "*://automa.vercel.app/*"],
-      "js": ["webService.bundle.js"],
-      "run_at": "document_start",
-      "all_frames": false
     }
   ],
-  "optional_permissions": ["clipboardRead", "clipboardWrite", "downloads", "notifications", "cookies"],
+  "optional_permissions": [
+    "clipboardRead",
+    "clipboardWrite",
+    "downloads",
+    "notifications",
+    "cookies"
+  ],
   "permissions": [
     "tabs",
     "proxy",
