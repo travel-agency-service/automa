@@ -11,7 +11,7 @@
     padding="p-1"
     class="pointer-events-auto ml-4 flex items-center"
   >
-    <ui-popover>
+    <!-- <ui-popover>
       <template #trigger>
         <button
           v-tooltip.group="t('workflow.host.title')"
@@ -56,7 +56,7 @@
           />
         </transition-expand>
       </div>
-    </ui-popover>
+    </ui-popover> 
     <ui-popover :disabled="userDontHaveTeamsAccess">
       <template #trigger>
         <button
@@ -87,7 +87,7 @@
           With the community
         </ui-list-item>
       </ui-list>
-    </ui-popover>
+    </ui-popover> -->
   </ui-card>
   <ui-card
     v-if="canEdit"
@@ -657,6 +657,7 @@ function initRenameWorkflow() {
     description: `${props.workflow.description}`,
   });
 }
+//this is for renaming workflow
 function renameWorkflow() {
   updateWorkflow({
     name: renameState.name,
@@ -677,7 +678,22 @@ function deleteWorkflow() {
       } else if (props.isTeam) {
         await teamWorkflowStore.delete(teamId, props.workflow.id);
       } else {
-        await workflowStore.delete(props.workflow.id);
+        // this is for deleting a workflow
+        try {
+          const customDeleteResult = await workflowStore.customDelete(
+            props.workflow.id
+          );
+          if (customDeleteResult) {
+            toast.success('The workflow was removed successfully.');
+          } else {
+            toast.error(
+              'An error occured while removing workflow from server!'
+            );
+          }
+        } catch (e) {
+          console.log(e);
+          toast.error('An error occured while removing workflow from server!');
+        }
       }
 
       router.replace(props.isPackage ? '/packages' : '/');
@@ -685,6 +701,8 @@ function deleteWorkflow() {
   });
 }
 async function saveWorkflow() {
+  // FINDING by alireza
+  // For saving workflow in editor mode in a new tab (using save button)
   try {
     const flow = props.editor.toObject();
     flow.edges = flow.edges.map((edge) => {
@@ -795,16 +813,16 @@ const modalActions = [
     name: t('workflow.table.title'),
     icon: 'riTable2',
   },
-  {
-    id: 'global-data',
-    name: t('common.globalData'),
-    icon: 'riDatabase2Line',
-  },
-  {
-    id: 'settings',
-    name: t('common.settings'),
-    icon: 'riSettings3Line',
-  },
+  // {
+  //   id: 'global-data',
+  //   name: t('common.globalData'),
+  //   icon: 'riDatabase2Line',
+  // },
+  // {
+  //   id: 'settings',
+  //   name: t('common.settings'),
+  //   icon: 'riSettings3Line',
+  // },
 ];
 const moreActions = [
   {

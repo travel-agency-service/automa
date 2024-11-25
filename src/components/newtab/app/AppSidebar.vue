@@ -1,5 +1,5 @@
 <template>
-  <aside
+  <!-- <aside
     class="fixed left-0 top-0 z-50 flex h-screen w-16 flex-col items-center bg-white py-6 dark:bg-gray-800"
   >
     <img
@@ -110,7 +110,7 @@
     <router-link v-tooltip:right.group="t('settings.menu.about')" to="/about">
       <v-remixicon class="cursor-pointer" name="riInformationLine" />
     </router-link>
-  </aside>
+  </aside> -->
 </template>
 <script setup>
 import { ref, computed } from 'vue';

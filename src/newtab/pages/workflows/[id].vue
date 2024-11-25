@@ -82,7 +82,7 @@
               {{ t('common.settings') }}
             </ui-tab>
           </template>
-          <ui-tab v-else value="logs" class="flex items-center">
+          <!-- <ui-tab v-else value="logs" class="flex items-center">
             {{ t('common.log', 2) }}
             <span
               v-if="workflowStates.length > 0"
@@ -91,7 +91,7 @@
             >
               {{ workflowStates.length }}
             </span>
-          </ui-tab>
+          </ui-tab> -->
         </ui-tabs>
         <ui-card v-if="isTeamWorkflow" padding="p-1 ml-4 pointer-events-auto">
           <ui-input
@@ -204,14 +204,14 @@
                   <v-remixicon name="riArrowGoForwardLine" />
                 </button>
               </ui-card>
-              <button
+              <!-- <button
                 v-if="!isPackage && haveEditAccess"
                 v-tooltip="t('packages.open')"
                 class="control-button hoverable ml-2"
                 @click="blockFolderModal.showList = !blockFolderModal.showList"
               >
                 <v-remixicon name="mdiPackageVariantClosed" />
-              </button>
+              </button> -->
               <button
                 v-tooltip="t('workflow.autoAlign.title')"
                 class="control-button hoverable ml-2"

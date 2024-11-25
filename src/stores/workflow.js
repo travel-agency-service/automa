@@ -12,6 +12,7 @@ import {
   registerWorkflowTrigger,
 } from '@/utils/workflowTrigger';
 import { useUserStore } from './user';
+import { customFetchApi } from '@/utils/customApi';
 
 const defaultWorkflow = (data = null, options = {}) => {
   let workflowData = {
@@ -120,18 +121,66 @@ export const useWorkflowStore = defineStore('workflow', {
       let localWorkflows = workflows || {};
 
       if (isFirstTime) {
-        localWorkflows = firstWorkflows.map((workflow) =>
-          defaultWorkflow(workflow)
-        );
-        await browser.storage.local.set({
-          isFirstTime: false,
-          workflows: localWorkflows,
-        });
+        // FINDING by alireza
+        // this is for setting default workflows from a file to global store and browser storage
+        // localWorkflows = firstWorkflows.map((workflow) =>
+        //   defaultWorkflow(workflow)
+        // );
+
+        try {
+          const apiResponse = await customFetchApi('/automation/workflows/', {
+            method: 'GET',
+          });
+          if (apiResponse.status !== 200) {
+            alert(
+              'There is an error while fetching workflows from the server.'
+            );
+            return null;
+          }
+          const apiResult = await apiResponse.json();
+          localWorkflows = apiResult.map((x) => defaultWorkflow(x.data));
+
+          await browser.storage.local.set({
+            isFirstTime: false,
+            workflows: localWorkflows,
+          });
+        } catch (e) {
+          alert('There is an error while fetching workflows from the server.');
+          return null;
+        }
       }
 
       this.isFirstTime = isFirstTime;
       this.workflows = convertWorkflowsToObject(localWorkflows);
 
+      this.retrieved = true;
+    },
+    async customRefetchData() {
+      const { workflows } = await browser.storage.local.get(['workflows']);
+
+      let localWorkflows = workflows || {};
+
+      try {
+        const apiResponse = await customFetchApi('/automation/workflows/', {
+          method: 'GET',
+        });
+        if (apiResponse.status !== 200) {
+          alert('There is an error while fetching workflows from the server.');
+          return null;
+        }
+        const apiResult = await apiResponse.json();
+        localWorkflows = apiResult.map((x) => defaultWorkflow(x.data));
+
+        await browser.storage.local.set({
+          isFirstTime: false,
+          workflows: localWorkflows,
+        });
+      } catch (e) {
+        alert('There is an error while fetching workflows from the server.');
+        return null;
+      }
+
+      this.workflows = convertWorkflowsToObject(localWorkflows);
       this.retrieved = true;
     },
     updateStates(newStates) {
@@ -164,36 +213,123 @@ export const useWorkflowStore = defineStore('workflow', {
 
       return insertedWorkflows;
     },
+    async customInsert(data = {}, options = {}) {
+      const insertedWorkflow = {};
+      const workflow = defaultWorkflow(data, options);
+
+      try {
+        const apiResponse = await customFetchApi(
+          '/automation/workflows/create',
+          {
+            body: JSON.stringify({
+              nanoid: workflow.id,
+              data: workflow,
+            }),
+            method: 'POST',
+          }
+        );
+        if (apiResponse.status !== 200) {
+          return null;
+        }
+        await this.customRefetchData();
+
+        this.workflows[workflow.id] = workflow;
+        insertedWorkflow[workflow.id] = workflow;
+        await this.saveToStorage('workflows');
+        return insertedWorkflow;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    },
     async update({ id, data = {}, deep = false }) {
       const isFunction = typeof id === 'function';
       if (!isFunction && !this.workflows[id]) return null;
 
+      const currentDate = Date.now();
       const updatedWorkflows = {};
-      const updateData = { ...data, updatedAt: Date.now() };
+      const updateData = { ...data, updatedAt: currentDate };
 
       const workflowUpdater = (workflowId) => {
+        let successful = true;
         if (deep) {
-          this.workflows[workflowId] = deepmerge(
+          const mergedWorkFlow = deepmerge(
             this.workflows[workflowId],
             updateData
           );
+
+          customFetchApi(`/automation/workflows/${workflowId}/update`, {
+            body: JSON.stringify({
+              data: mergedWorkFlow,
+            }),
+            method: 'PUT',
+          })
+            .then((apiResponse) => {
+              if (apiResponse.status !== 200) {
+                return null;
+              }
+              this.customRefetchData()
+                .then((res) => {
+                  this.workflows[workflowId] = mergedWorkFlow;
+                })
+                .catch((err) => {
+                  successful = false;
+                  console.log(e);
+                  return null;
+                });
+            })
+            .catch((err) => {
+              successful = false;
+              console.log(err);
+              return null;
+            });
         } else {
-          Object.assign(this.workflows[workflowId], updateData);
-        }
-
-        this.workflows[workflowId].updatedAt = Date.now();
-        updatedWorkflows[workflowId] = this.workflows[workflowId];
-
-        if (!('isDisabled' in data)) return;
-
-        if (data.isDisabled) {
-          cleanWorkflowTriggers(workflowId);
-        } else {
-          const triggerBlock = this.workflows[workflowId].drawflow.nodes?.find(
-            (node) => node.label === 'trigger'
+          const copyCurrentWorkflow = JSON.parse(
+            JSON.stringify(this.workflows[workflowId])
           );
-          if (triggerBlock) {
-            registerWorkflowTrigger(id, triggerBlock);
+          Object.assign(copyCurrentWorkflow, updateData);
+
+          customFetchApi(`/automation/workflows/${workflowId}/update`, {
+            body: JSON.stringify({
+              data: copyCurrentWorkflow,
+            }),
+            method: 'PUT',
+          })
+            .then((apiResponse) => {
+              if (apiResponse.status !== 200) {
+                return null;
+              }
+              this.customRefetchData()
+                .then((res) => {
+                  Object.assign(this.workflows[workflowId], updateData);
+                })
+                .catch((err) => {
+                  successful = false;
+                  console.log(e);
+                  return null;
+                });
+            })
+            .catch((err) => {
+              successful = false;
+              console.log(err);
+              return null;
+            });
+        }
+        if (successful) {
+          this.workflows[workflowId].updatedAt = currentDate;
+          updatedWorkflows[workflowId] = this.workflows[workflowId];
+
+          if (!('isDisabled' in data)) return;
+
+          if (data.isDisabled) {
+            cleanWorkflowTriggers(workflowId);
+          } else {
+            const triggerBlock = this.workflows[
+              workflowId
+            ].drawflow.nodes?.find((node) => node.label === 'trigger');
+            if (triggerBlock) {
+              registerWorkflowTrigger(id, triggerBlock);
+            }
           }
         }
       };
@@ -295,6 +431,47 @@ export const useWorkflowStore = defineStore('workflow', {
       }
 
       return id;
+    },
+    async customDelete(id) {
+      try {
+        const apiResponse = await customFetchApi(
+          `/automation/workflows/${id}/delete`,
+          {
+            method: 'DELETE',
+          }
+        );
+        if (apiResponse.status !== 200) {
+          return null;
+        }
+        await this.customRefetchData();
+
+        delete this.workflows[id];
+
+        await cleanWorkflowTriggers(id);
+
+        await browser.storage.local.remove([
+          `state:${id}`,
+          `draft:${id}`,
+          `draft-team:${id}`,
+        ]);
+        await this.saveToStorage('workflows');
+
+        const { pinnedWorkflows } = await browser.storage.local.get(
+          'pinnedWorkflows'
+        );
+        const pinnedWorkflowIndex = pinnedWorkflows
+          ? pinnedWorkflows.indexOf(id)
+          : -1;
+        if (pinnedWorkflowIndex !== -1) {
+          pinnedWorkflows.splice(pinnedWorkflowIndex, 1);
+          await browser.storage.local.set({ pinnedWorkflows });
+        }
+
+        return id;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
     },
   },
 });

@@ -26,6 +26,18 @@ browser.runtime.onInstalled.addListener(
   BackgroundEventsListeners.onRuntimeInstalled
 );
 
+// FINDING by alireza
+/* eslint-disable-next-line */
+browser.runtime.onMessage.addListener(function (request, sender, sendResponse){
+  if (request.action === 'openExtension') {
+    browser.windows.create({
+      type: 'popup',
+      state: 'maximized',
+      url: browser.runtime.getURL('newtab.html#/welcome'),
+    });
+  }
+});
+
 browser.webNavigation.onCompleted.addListener(
   BackgroundEventsListeners.onWebNavigationCompleted
 );

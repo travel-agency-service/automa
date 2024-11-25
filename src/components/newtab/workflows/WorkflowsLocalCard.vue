@@ -1,4 +1,6 @@
 <template>
+  <!-- // FINDING by alireza -->
+  <!-- This file is For disabling and pinning workflows popup in a workflows card in a new tab -->
   <shared-card
     :data="workflow"
     :data-workflow="workflow.id"

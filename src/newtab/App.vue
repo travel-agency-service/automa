@@ -1,7 +1,8 @@
 <template>
   <template v-if="retrieved">
     <app-sidebar v-if="$route.name !== 'recording'" />
-    <main :class="{ 'pl-16': $route.name !== 'recording' }">
+    <!-- <main :class="{ 'pl-16': $route.name !== 'recording' }"> -->
+    <main>
       <router-view />
     </main>
     <app-logs />
@@ -275,8 +276,8 @@ useHead(() => {
     title: 'Dashboard',
     titleTemplate:
       runningWorkflows > 0
-        ? `%s (${runningWorkflows} Workflows Running) - Automa`
-        : '%s - Automa',
+        ? `%s (${runningWorkflows} Workflows Running) - TAS`
+        : '%s - TAS',
   };
 });
 

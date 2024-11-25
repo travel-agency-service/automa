@@ -8,9 +8,9 @@
     class="dark relative z-10 px-5 pt-8 text-white placeholder:text-black"
   >
     <div class="mb-4 flex items-center">
-      <h1 class="text-xl font-semibold text-white">Automa</h1>
+      <h1 class="text-xl font-semibold text-white">TAS Workflow</h1>
       <div class="grow"></div>
-      <ui-button
+      <!-- <ui-button
         v-tooltip.group="
           'Start recording by opening the dashboard. Click to learn more'
         "
@@ -19,7 +19,7 @@
         @click="openDocs"
       >
         <v-remixicon name="riRecordCircleLine" />
-      </ui-button>
+      </ui-button> -->
       <ui-button
         v-tooltip.group="
           t(`home.elementSelector.${state.haveAccess ? 'name' : 'noAccess'}`)
@@ -39,7 +39,7 @@
         <v-remixicon name="riHome5Line" />
       </ui-button>
     </div>
-    <div class="flex">
+    <!-- <div class="flex">
       <ui-input
         v-model="state.query"
         :placeholder="`${t('common.search')}...`"
@@ -47,7 +47,7 @@
         prepend-icon="riSearch2Line"
         class="search-input w-full"
       />
-    </div>
+    </div> -->
     <ui-tabs
       v-if="showTab"
       v-model="state.activeTab"
@@ -64,7 +64,7 @@
       <ui-tab v-if="userStore.user?.teams?.length" value="team"> Teams </ui-tab>
     </ui-tabs>
   </div>
-  <home-team-workflows
+  <!-- <home-team-workflows
     v-if="state.retrieved"
     v-show="state.activeTab === 'team'"
     :search="state.query"
@@ -177,8 +177,8 @@
         size="20"
         @click="closeSettingsPopup"
       />
-    </div>
-  </div>
+    </div> 
+  </div> -->
 </template>
 <script setup>
 import { computed, onMounted, shallowReactive, watch } from 'vue';

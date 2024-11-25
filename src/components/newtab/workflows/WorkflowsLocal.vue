@@ -1,4 +1,6 @@
 <template>
+  <!-- // FINDING by alireza -->
+  <!-- For copying id, duplicating, exporting, renaming and deleting popup in a workflow card in a new tab-->
   <div
     v-if="workflowStore.getWorkflows.length === 0"
     class="md:flex items-center md:text-left text-center py-12"
@@ -124,6 +126,7 @@ import { exportWorkflow } from '@/utils/workflowData';
 import { useSharedWorkflowStore } from '@/stores/sharedWorkflow';
 import { executeWorkflow } from '@/workflowEngine';
 import WorkflowsLocalCard from './WorkflowsLocalCard.vue';
+import { useToast } from 'vue-toastification';
 
 const props = defineProps({
   search: {
@@ -151,6 +154,7 @@ const emit = defineEmits(['update:perPage']);
 const { t } = useI18n();
 const dialog = useDialog();
 const userStore = useUserStore();
+const toast = useToast();
 const workflowStore = useWorkflowStore();
 const sharedWorkflowStore = useSharedWorkflowStore();
 
@@ -286,12 +290,27 @@ function renameWorkflow() {
   clearRenameModal();
 }
 function deleteWorkflow({ name, id }) {
+  // FINDING by alireza
+  // For deleting a workflow
   dialog.confirm({
     title: t('workflow.delete'),
     okVariant: 'danger',
     body: t('message.delete', { name }),
     onConfirm: () => {
-      workflowStore.delete(id);
+      workflowStore
+        .customDelete(id)
+        .then((res) => {
+          if (res) {
+            toast.success('The workflow was removed successfully.');
+          } else {
+            toast.error(
+              'An error occured while removing workflow from server!'
+            );
+          }
+        })
+        .catch((e) => {
+          toast.error('An error occured while removing workflow from server!');
+        });
     },
   });
 }
